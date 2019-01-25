@@ -1,0 +1,56 @@
+ Vc precisa criar um módulo dentro do VBA e escrever essa fórmula
+
+
+Function QrCode(codetext As String)
+   
+    Dim URL As String, mycell As Range
+    Set mycell = Application.Caller
+       
+    URL = "https://chart.googleapis.com/chart?chs=100x100&cht=qr&chl=" & codetext
+    On Error Resume Next
+        ativesheet.Pictures("QR_" & mycell.adress(False, False)).Delete
+    On Error GoTo 0
+    ActiveSheet.Pictures.Insert(URL).Select
+    With Selection.ShapeRange(1)
+    .PictureFormat.CropLeft = 15
+    .PictureFormat.CropRight = 15
+    .PictureFormat.CropTop = 15
+    .PictureFormat.CropBottom = 15
+    .Name = "QR_" & mycell.adress(False, False)
+    .Left = mycell.Left + 2
+    .Top = mycell.Top + 2
+    End With
+
+
+End Function
+
+
+Então, vc entra no excel e digita em uma célula a fórmula:
+
+=QRCode(A1)
+
+no exemplo acima, será criado um código com as informações contidas na célula A1. É necessário conexão com a internet
+
+Uso do QR-Code com VBA para o preenchimento de planilha
+https://www.extendoffice.com/pt/documents/excel/5404-excel-create-qr-code.html
+
+
+Sub setQR()
+'Updated by Extendoffice 2018/8/22
+    Dim xSRg As Range
+    Dim xRRg As Range
+    Dim xObjOLE As OLEObject
+    On Error Resume Next
+    Set xSRg = Application.InputBox("Please select the cell you will create QR code based on", "Kutools for Excel", , , , , , 8)
+    If xSRg Is Nothing Then Exit Sub
+    Set xRRg = Application.InputBox("Select a cell to place the QR code", "Kutools for Excel", , , , , , 8)
+    If xRRg Is Nothing Then Exit Sub
+    Application.ScreenUpdating = False
+    Set xObjOLE = ActiveSheet.OLEObjects.Add("BARCODE.BarCodeCtrl.1")
+    xObjOLE.Object.Style = 11
+    xObjOLE.Object.Value = xSRg.Text
+    ActiveSheet.Shapes.Item(xObjOLE.Name).Copy
+    ActiveSheet.Paste xRRg
+    xObjOLE.Delete
+    Application.ScreenUpdating = True
+End Sub
